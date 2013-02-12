@@ -24,28 +24,25 @@ define git::repo (
   $source  = false,
   $user    = 'root'
 ) {
-
   require git::params
 
-  if $source {
-    $cmd = "${git::params::bin} clone ${source} ${target} --recursive"
-  } else {
-    if $bare {
-      $cmd = "${git::params::bin} init --bare ${target}"
-    } else {
-      $cmd = "${git::params::bin} init ${target}"
-    }
+  $bare_flag = $bare ? {
+    true => '--bare',
+    default => '',
   }
 
-  $creates = $bare ? {
-    true  => "${target}/objects",
-    false => "${target}/.git",
+  if $source {
+    $cmd = "${git::params::bin} clone --recursive ${bare_flag} ${source} ${target}"
+  } else {
+    $cmd = "${git::params::bin} ${bare_flag} init ${target}"
   }
 
   exec { "git_repo_for_${name}":
     command => $cmd,
     creates => $creates,
     require => Class['git::install'],
-    user    => $user
+    user    => $user,
+    logoutput => 'on_failure',
+    cwd => '/tmp',
   }
 }
