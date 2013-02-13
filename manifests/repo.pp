@@ -31,7 +31,7 @@ define git::repo (
     default => '',
   }
 
-  $creates = $bare_flag ? {
+  $creates = $bare ? {
     true  => "${target}/objects",
     false => "${target}/.git",
   }
