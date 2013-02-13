@@ -31,6 +31,11 @@ define git::repo (
     default => '',
   }
 
+  $creates = $bare_flag ? {
+    true  => "${target}/objects",
+    false => "${target}/.git",
+  }
+
   if $source {
     $cmd = "${git::params::bin} clone --recursive ${bare_flag} ${source} ${target}"
   } else {
